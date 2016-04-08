@@ -48,13 +48,36 @@ function handleResponse(e) {
   lock.waitLock(30000);  // wait 30 seconds before conceding defeat.
   
   try {
+    var action = e.parameter.action;
+    
+    if (action == 'create') {
+      return create(e);
+    } else if (action == 'retrieve') {
+      return retrieve(e);
+    } else if (action == 'update') {
+      return update(e);  
+    } else if (action == 'delete') {
+      return del(e);
+    }
+  } catch(e){
+    // if error return this
+    return ContentService
+          .createTextOutput(JSON.stringify({"result":"error", "error": e}))
+          .setMimeType(ContentService.MimeType.JSON);
+  } finally { //release lock
+    lock.releaseLock();
+  }
+}
+
+function create(e) {
     // next set where we write the data - you could write to multiple/alternate destinations
     var doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
     var sheet = doc.getSheetByName(SHEET_NAME);
     
     // we'll assume header is in row 1 but you can override with header_row in GET/POST data
     var headRow = e.parameter.header_row || 1;
-    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var numColumns = sheet.getLastColumn();
+    var headers = sheet.getRange(1, 1, 1, numColumns).getValues()[0];
     var nextRow = sheet.getLastRow()+1; // get next row
     var row = []; 
     // loop through the header columns
@@ -71,14 +94,27 @@ function handleResponse(e) {
     return ContentService
           .createTextOutput(JSON.stringify({"result":"success", "row": nextRow}))
           .setMimeType(ContentService.MimeType.JSON);
-  } catch(e){
-    // if error return this
-    return ContentService
-          .createTextOutput(JSON.stringify({"result":"error", "error": e}))
-          .setMimeType(ContentService.MimeType.JSON);
-  } finally { //release lock
-    lock.releaseLock();
-  }
+}
+
+function retrieve(e) {
+  var doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
+  var sheet = doc.getSheetByName(SHEET_NAME);
+  var numRows = sheet.getLastRow();
+  var numColumns = sheet.getLastColumn();
+  var range =  sheet.getRange(1, 1, numRows, numColumns);
+  var values = range.getValues();
+    
+  return ContentService
+    .createTextOutput(JSON.stringify({"result":"success", "values": values}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function update(e) {
+
+}
+
+function del(e) {
+
 }
 
 function setup() {
