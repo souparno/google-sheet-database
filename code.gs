@@ -16,7 +16,7 @@
 
 // Usage
 //  1. Enter sheet name where data is to be written below
-var SHEET_NAME = "Form responses 1";
+        var SHEET_NAME = "Form responses 1";
         
 //  2. Run > setup
 //
@@ -69,6 +69,21 @@ function handleResponse(e) {
   }
 }
 
+function getDataArr(headers, e){
+    var row = [];
+    // loop through the header columns
+    for (i in headers){
+      if (headers[i] == "Timestamp"){ // special case if you include a 'Timestamp' column
+        row.push(new Date());
+      } else { // else use header name to get data
+        row.push(e.parameter[headers[i]]);
+      }
+    }
+    
+    return row;
+}
+
+
 function create(e) {
     // next set where we write the data - you could write to multiple/alternate destinations
     var doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
@@ -79,15 +94,7 @@ function create(e) {
     var numColumns = sheet.getLastColumn();
     var headers = sheet.getRange(1, 1, 1, numColumns).getValues()[0];
     var nextRow = sheet.getLastRow()+1; // get next row
-    var row = []; 
-    // loop through the header columns
-    for (i in headers){
-      if (headers[i] == "Timestamp"){ // special case if you include a 'Timestamp' column
-        row.push(new Date());
-      } else { // else use header name to get data
-        row.push(e.parameter[headers[i]]);
-      }
-    }
+    var row = getDataArr(headers, e);
     // more efficient to set values as [][] array than individually
     sheet.getRange(nextRow, 1, 1, row.length).setValues([row]);
     // return json success results
@@ -110,7 +117,19 @@ function retrieve(e) {
 }
 
 function update(e) {
-
+  var doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
+  var sheet = doc.getSheetByName(SHEET_NAME);
+  var numColumns = sheet.getLastColumn();
+  var headers = sheet.getRange(1, 1, 1, numColumns).getValues()[0];
+  var row = getDataArr(headers, e);
+  var rowId = e.parameter.rowId;
+    
+  // more efficient to set values as [][] array than individually
+  sheet.getRange(rowId, 1, 1, numColumns).setValues([row]);
+  // return json success results
+  return ContentService
+      .createTextOutput(JSON.stringify({"result":"success", "row": rowId}))
+      .setMimeType(ContentService.MimeType.JSON);
 }
 
 function del(e) {
