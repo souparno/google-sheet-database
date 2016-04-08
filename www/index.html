@@ -1,0 +1,66 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+</script>
+<script>
+function postContactToGoogle() {
+var firstname=$('#firstname').val();
+var lastname=$('#lastname').val();
+$.ajax({
+  url:"https://script.google.com/macros/s/AKfycbz3TxgkVDe0-3O3X3dlchPd4pUwk_Tr2TMr4bNda4y4cwPwnfE/exec",
+  data:{"firstname":firstname,"lastname":lastname},
+  type:"POST",
+  success: function (data) {
+    alert('success', data);
+  },
+  error: function () {
+    console.log('fail');
+  }
+});
+}
+</script>
+<style>
+.FormRequest {
+background: lightyellow;
+width:400px;
+height:250px;
+border:1px solid blue;
+border-radius:10px 10px 10px 10px;
+}
+.FormRequest #formRequest{
+margin-left:20px;
+font-family:consolas;
+color: blue;
+}
+.FormRequest #formRequest input[type="button"],input[type="reset"]{
+border:1px solid green;
+background: darkred;
+color:white;
+border-radius:3px 3px 3px 3px;
+}
+</style>
+</head>
+<body bgcolor="silver">
+
+<table  class="FormRequest" align="center">
+<tr><td>
+<form id="formRequest">
+
+FIRST NAME:<br/>
+<input type="text" name="firstname" id="firstname" placeholder="First Name" /><br/>
+
+LAST NAME:<br/>
+<input type="text" name="lastname" id="lastname" placeholder="Last Name" /><br/>
+<center>
+<input type="button" name="Submit" id="Submit" onclick="postContactToGoogle()" value="Submit"/>
+<input type="reset" value="Reset"/>
+</center>
+
+
+</form>
+
+</td></td>
+</table>
+
+</body>
+</html>
