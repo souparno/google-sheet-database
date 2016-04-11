@@ -8,7 +8,7 @@ var firstname=$('#firstname').val();
 var lastname=$('#lastname').val();
 $.ajax({
   url:"https://script.google.com/macros/s/AKfycbz3TxgkVDe0-3O3X3dlchPd4pUwk_Tr2TMr4bNda4y4cwPwnfE/exec",
-  data:{"firstname":firstname,"lastname":lastname},
+  data:{"action":"create","firstname":firstname,"lastname":lastname},
   type:"POST",
   success: function (data) {
     alert('success', data);
